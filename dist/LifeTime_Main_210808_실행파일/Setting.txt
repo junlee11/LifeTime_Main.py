@@ -1,0 +1,6 @@
+picker_line,3.0
+picker_legend,5.0
+thick_line,3.0
+import_MinLT,90.0
+title_font_size,9.0
+plot_init_key,x
