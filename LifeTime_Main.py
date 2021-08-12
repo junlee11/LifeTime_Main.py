@@ -818,6 +818,7 @@ class WindowClass(QMainWindow, form_class) :
                 #self.df_hourpass_raw_m.append(self.dic_fig_rawline_dfhourpass[temp_idx][c])
                 #self.df_hourpass_plot_m.append(self.dic_fig_rawline_dfhourpass[temp_idx][c])
                 #self.df_LT_raw_m.append(self.dic_fig_rawline_dfhourpass[temp_idx][c])
+            print('git test')
 
             for v_line in self.visible_LTline_list:
                 if flag_plot_delv['plotMax'] == False:
