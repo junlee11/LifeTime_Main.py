@@ -206,8 +206,28 @@ class WindowClass(QMainWindow, form_class) :
         self.dic_fig_LT_V = {}
         self.dic_fig_V_LT = {}
         self.dic_fig_V_leg = {}
-
         self.dic_fig_ax = {}
+
+        #merge
+        self.dic_fig_dfhourpassraw = {}
+        self.dic_fig_dfhourpassplot = {}
+        self.dic_fig_dfVraw = {}
+        self.dic_fig_dfVplot = {}
+        self.dic_fig_dfdelVraw = {}
+        self.dic_fig_dfdelVplot = {}
+        self.dic_fig_dflegend = {}
+        self.dic_fig_dfLTraw = {}
+        self.dic_fig_dfLTplot = {}
+
+        self.dic_fig_line_dfhourpassraw = {}
+        self.dic_fig_line_dfhourpassplot = {}
+        self.dic_fig_line_dfVraw = {}
+        self.dic_fig_line_dfVplot = {}
+        self.dic_fig_line_dfdelVraw = {}
+        self.dic_fig_line_dfdelVplot = {}
+        self.dic_fig_line_dfLTraw = {}
+        self.dic_fig_line_dfLTplot = {}
+        self.dic_fig_line_dflegend = {}
 
         # 리스트 선언
         self.list_fig = []
@@ -394,8 +414,10 @@ class WindowClass(QMainWindow, form_class) :
         self.ys = []
         self.list_ax = []
 
-        self.fig = plt.figure(figsize=(float(set_dic['fig_width']), float(set_dic['fig_length'])))
-        self.fig.set_facecolor('white')
+        #merge 할때는 fig생성해서 넘어옴
+        if flag_plot_delv['merge'] == False:
+            self.fig = plt.figure(figsize=(float(set_dic['fig_width']), float(set_dic['fig_length'])))
+            self.fig.set_facecolor('white')
 
         if flag_plot_delv['plotMax_btn'] == True or flag_plot_delv['delV_btn'] == True:
             plt.close(self.list_fig[self.idx_fig])
@@ -404,21 +426,16 @@ class WindowClass(QMainWindow, form_class) :
         if flag_plot_delv['plot_btn'] > 1:
             self.list_fig.pop()
 
-        self.idx_fig = plt.gcf().number - 1
-        self.list_fig.append(self.fig)
+        if flag_plot_delv['merge'] == False:
+            self.idx_fig = plt.gcf().number - 1
+            self.list_fig.append(self.fig)
 
         if flag_plot_delv['merge'] == False:
-            if self.chk_V.isChecked() == True:
-                gs = self.list_fig[self.idx_fig].add_gridspec(2, len(LT_list), height_ratios=[3, 1])
-            else:
-                gs = self.list_fig[self.idx_fig].add_gridspec(1, len(LT_list))
+            gs = self.list_fig[self.idx_fig].add_gridspec(2, len(LT_list), height_ratios=[3, 1]) if self.chk_V.isChecked()==True else self.list_fig[self.idx_fig].add_gridspec(1, len(LT_list))
         else:
-            if self.chk_V.isChecked() == True:
-                gs = self.list_fig[self.idx_fig].add_gridspec(2, 1, height_ratios=[3, 1])
-            else:
-                gs = self.list_fig[self.idx_fig].add_gridspec(1, 1)
-        #Lot에 대한 반복을 진행
+            gs = self.list_fig[self.idx_fig].add_gridspec(2, 1, height_ratios=[3, 1]) if self.chk_V.isChecked()==True else self.list_fig[self.idx_fig].add_gridspec(1, 1)
 
+        #Lot에 대한 반복을 진행
         for i in LT_list:
             self.df_hourpass_raw = []
             self.df_V_raw = []
@@ -431,29 +448,28 @@ class WindowClass(QMainWindow, form_class) :
             self.df_V_plot = []
             self.df_delV_plot = []
 
-            #merge용 변수
-            if flag_plot_delv['merge'] == False:
-                self.dic_ax_LTlinelist = {}
-                self.dic_ax_Vlinelist = {}
-                self.dic_rawline_dfhourpass = {}
-                self.dic_plotline_dfhourpass = {}
-                self.dic_rawline_dfV = {}
-                self.dic_rawline_dfdelV = {}
-                self.dic_plotline_dfV = {}
-                self.dic_plotline_dfdelV = {}
-                self.dic_rawline_dfLT = {}
-                self.dic_plotline_dfLT = {}
-                self.visible_LTline_list = []
-                self.visible_Vline_list = []
+            self.dic_ax_LTlinelist = {}
+            self.dic_ax_Vlinelist = {}
+            self.dic_rawline_dfhourpass = {}
+            self.dic_plotline_dfhourpass = {}
+            self.dic_rawline_dfV = {}
+            self.dic_rawline_dfdelV = {}
+            self.dic_plotline_dfV = {}
+            self.dic_plotline_dfdelV = {}
+            self.dic_rawline_dfLT = {}
+            self.dic_plotline_dfLT = {}
+            self.visible_LTline_list = []
+            self.visible_Vline_list = []
 
-                self.df_hourpass_raw_m = []
-                self.df_hourpass_plot_m = []
-                self.df_LT_raw_m = []
-                self.df_LT_plot_m = []
-                self.df_V_raw_m = []
-                self.df_V_plot_m = []
-                self.df_delV_raw_m = []
-                self.df_delV_plot_m = []
+            self.dic_line_dfhourpassraw = {}
+            self.dic_line_dfhourpassplot = {}
+            self.dic_line_dfVraw = {}
+            self.dic_line_dfVplot = {}
+            self.dic_line_dfdelVraw = {}
+            self.dic_line_dfdelVplot = {}
+            self.dic_line_dfLTraw = {}
+            self.dic_line_dfLTplot = {}
+            self.dic_line_dflegend = {}
 
             kk = 0
 ########################################################################################################################
@@ -468,7 +484,6 @@ class WindowClass(QMainWindow, form_class) :
                         row_skip = 6
 
                     #Raw 데이터프레임
-
                     self.df_hourpass_raw.append(pd.read_csv(i + j, header=None, skiprows=row_skip, usecols=[0]))
                     self.df_V_raw.append(pd.read_csv(i + j, header=None, skiprows=row_skip, usecols=[2]))
                     self.df_LT_raw.append(pd.read_csv(i + j, header=None, skiprows=row_skip, usecols=[5]))
@@ -539,7 +554,21 @@ class WindowClass(QMainWindow, form_class) :
                 #df가지고 plot그림
                 self.idx_ax = LT_list.index(i) * (1 + self.flag_V) + k
 
-                self.draw_LT_V_graph(LT_list.index(i),k)
+                if flag_plot_delv['merge'] == False:
+                    self.draw_LT_V_graph(LT_list.index(i),k)
+                else:
+                    self.draw_LT_V_graph_m(LT_list.index(i),k)
+
+            # merge
+            self.dic_fig_line_dfhourpassraw[self.list_fig[self.idx_fig]] = self.dic_line_dfhourpassraw
+            self.dic_fig_line_dfhourpassplot[self.list_fig[self.idx_fig]] = self.dic_line_dfhourpassplot
+            self.dic_fig_line_dfLTraw[self.list_fig[self.idx_fig]] = self.dic_line_dfLTraw
+            self.dic_fig_line_dfLTplot[self.list_fig[self.idx_fig]] = self.dic_line_dfLTplot
+            self.dic_fig_line_dfVraw[self.list_fig[self.idx_fig]] = self.dic_line_dfVraw
+            self.dic_fig_line_dfVplot[self.list_fig[self.idx_fig]] = self.dic_line_dfdelVplot
+            self.dic_fig_line_dfdelVraw[self.list_fig[self.idx_fig]] = self.dic_line_dfdelVraw
+            self.dic_fig_line_dfdelVplot[self.list_fig[self.idx_fig]] = self.dic_line_dfdelVplot
+            self.dic_fig_line_dflegend[self.list_fig[self.idx_fig]] = self.dic_line_dflegend
 
         self.dic_fig_ax[self.list_fig[self.idx_fig]] = self.list_ax
 
@@ -591,7 +620,17 @@ class WindowClass(QMainWindow, form_class) :
                     self.temp_l, = self.ax.plot(self.df_hourpass_R, self.df_delV_R, label='_nolegend_', picker = float(set_dic['picker_line']), linewidth=float(set_dic['thick_line']))  # 범례 생략
                     self.dic_plotline_dfdelV[self.temp_l] = self.df_delV_R
 
-            #self.list_ax[self.idx_ax].set_xlim(left=0, right=self.hourpass_max_val * float(set_dic['plot_time_ratio']))  # x축 최소값 0으로 지정
+            #merge
+            self.dic_line_dfhourpassraw[self.temp_l] = self.dic_fig_ax_dfhourpassraw[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfhourpassplot[self.temp_l] = self.dic_fig_ax_dfhourpassplot[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfLTraw[self.temp_l] = self.dic_fig_ax_dfLTraw[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfLTplot[self.temp_l] = self.dic_fig_ax_dfLTplot[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfVraw[self.temp_l] = self.dic_fig_ax_dfVraw[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfVplot[self.temp_l] = self.dic_fig_ax_dfVplot[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfdelVraw[self.temp_l] = self.dic_fig_ax_dfdelVraw[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dfdelVplot[self.temp_l] = self.dic_fig_ax_dfdelVplot[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+            self.dic_line_dflegend[self.temp_l] = self.dic_fig_ax_dflegend[self.list_fig[self.idx_fig]][self.list_ax[self.idx_ax]][m]
+
             plt.gca().set_xlim(left=0, right=self.hourpass_max_val * float(set_dic['plot_time_ratio']))  # x축 최소값 0으로 지정
 
             if self.flag_LT_min == 1:
@@ -600,14 +639,100 @@ class WindowClass(QMainWindow, form_class) :
 
             temp_picker_lines.append(self.temp_l)
 
+
+
+        self.dic_ax_line[self.list_ax[self.idx_ax]] = temp_picker_lines
+        self.dic_fig_ax_line[self.list_fig[self.idx_fig]] = self.dic_ax_line
+
         plt.gca().grid(True, axis='y', alpha=0.5)  # y축 grid 설정
         plt.title(self.lot_name, fontsize = float(set_dic['title_font_size']))
 
         self.picker_lines.append(temp_picker_lines)
 
-        #Merge
-        self.dic_ax_line[self.list_ax[LT_index * (1 + self.flag_V) + k]] = temp_picker_lines
+        #수명그래프에만 범례 표시하고 범례 선택할 수 있도록 한다.
+        if k == 0 :
+            self.on_press_temp = []
+            self.on_press_legend_temp = []
+            for legline, origline in zip(self.leg.get_lines(), self.picker_lines[LT_index * 2]):
+                legline.set_picker(float(set_dic['picker_legend']))
+                self.lined[legline] = origline              #범레 - 수명
+                self.plotlined[origline] = legline          #수명 - 범례
+                self.on_press_temp.append(origline)
+                self.on_press_legend_temp.append(legline)
+            self.on_press_legend[LT_index] = self.on_press_legend_temp
+
+        elif k == 1:
+            for legline, origline_V in zip(self.leg.get_lines(), self.picker_lines[LT_index * 2 + 1]):
+                self.lined_V[legline] = origline_V          #범례 - 전압
+                self.lined_V_torig[origline_V] = legline    #전압 - 범례
+                self.on_press_temp.append(origline_V)
+            self.on_press_line[LT_index] = self.on_press_temp  # on_press용 인덱스 - 라인 딕셔너리
+
+            for origline, origline_V in zip(self.picker_lines[LT_index *2], self.picker_lines[LT_index * 2 + 1]):
+                self.plotlined_V[origline] = origline_V     #수명 - 전압
+                self.plotlined_V_torig[origline_V] = origline #전압 - 수명
+
+        self.dic_fig_leg_LT[self.list_fig[self.idx_fig]] = self.lined
+        self.dic_fig_leg_V[self.list_fig[self.idx_fig]] = self.lined_V
+        self.dic_fig_LT_leg[self.list_fig[self.idx_fig]] = self.plotlined
+        self.dic_fig_LT_V[self.list_fig[self.idx_fig]] = self.plotlined_V
+        self.dic_fig_V_LT[self.list_fig[self.idx_fig]] = self.plotlined_V_torig
+        self.dic_fig_V_leg[self.list_fig[self.idx_fig]] = self.lined_V_torig
+
+    def draw_LT_V_graph_m(self, LT_index, k):
+        #전압 선택
+        if k == 1 and self.chk_V.isChecked() == False:
+            k = 2
+
+        #수명 그릴 때 / 전압 그릴 때로 나누어서
+        temp_picker_lines = []
+        #수명 셀 반복
+        for m in range(len(self.dic_fig_visibleLT[self.list_fig[self.idx_fig]])):
+            self.flag_LT_min = 0
+            self.df_hourpass_R = self.dic_fig_dfhourpassraw[self.list_fig[self.idx_fig]][m] if flag_plot_delv['plotMax'] == False else self.dic_fig_dfhourpassplot[self.list_fig[self.idx_fig]][m]
+            self.df_V_R = self.dic_fig_dfVraw[self.list_fig[self.idx_fig]][m] if flag_plot_delv['plotMax'] == False else self.dic_fig_dfVplot[self.list_fig[self.idx_fig]][m]
+            self.df_LT_R = self.dic_fig_dfLTraw[self.list_fig[self.idx_fig]][m] if flag_plot_delv['plotMax'] == False else self.dic_fig_dfLTplot[self.list_fig[self.idx_fig]][m]
+            self.df_delV_R = self.dic_fig_dfdelVraw[self.list_fig[self.idx_fig]][m] if flag_plot_delv['plotMax'] == False else self.dic_fig_dfdelVplot[self.list_fig[self.idx_fig]][m]
+            self.df_legend_R = self.dic_fig_dflegend[self.list_fig[self.idx_fig]][m]
+
+            if k == 0 :
+
+                if flag_plot_delv['plotMax'] == False:
+
+                    if m == 0: self.hourpass_max_val = self.df_hourpass_R.max()[0]
+                    if self.hourpass_max_val < self.df_hourpass_R.max()[0]: self.hourpass_max_val = self.df_hourpass_R.max()[0]
+
+                self.temp_l, = self.ax.plot(self.df_hourpass_R, self.df_LT_R, label=self.df_legend_R[-3:], picker = float(set_dic['picker_line']), linewidth=float(set_dic['thick_line']))
+                if self.df_LT_R.min()[5] < float(set_dic['import_MinLT']) or not str(self.df_LT_R.min()[5]).isdigit():  # 설정값보다 더 작은 값이 있다면
+                    self.LT_min_val = float(set_dic['import_MinLT'])
+                    self.flag_LT_min = 1
+
+                self.leg = self.ax.legend(ncol=2, prop={'size': 7})  # 범례
+                self.ax.set_ylim(top=101)
+
+            elif k == 1:
+                if flag_plot_delv['delV'] == False:
+                    self.temp_l, = self.ax.plot(self.df_hourpass_R, self.df_V_R, label='_nolegend_', picker = float(set_dic['picker_line']), linewidth=float(set_dic['thick_line']))  # 범례 생략
+                    self.dic_rawline_dfV[self.temp_l] = self.df_V_R
+                if flag_plot_delv['delV'] == True:
+                    self.temp_l, = self.ax.plot(self.df_hourpass_R, self.df_delV_R, label='_nolegend_', picker = float(set_dic['picker_line']), linewidth=float(set_dic['thick_line']))  # 범례 생략
+                    self.dic_plotline_dfdelV[self.temp_l] = self.df_delV_R
+
+            plt.gca().set_xlim(left=0, right=self.hourpass_max_val * float(set_dic['plot_time_ratio']))  # x축 최소값 0으로 지정
+
+            if self.flag_LT_min == 1:
+                #self.list_ax[self.idx_ax].set_ylim(bottom = self.LT_min_val)
+                plt.gca().set_ylim(bottom = self.LT_min_val)
+
+            temp_picker_lines.append(self.temp_l)
+
+        self.dic_ax_line[self.list_ax[self.idx_ax]] = temp_picker_lines
         self.dic_fig_ax_line[self.list_fig[self.idx_fig]] = self.dic_ax_line
+
+        plt.gca().grid(True, axis='y', alpha=0.5)  # y축 grid 설정
+        plt.title(self.lot_name, fontsize = float(set_dic['title_font_size']))
+
+        self.picker_lines.append(temp_picker_lines)
 
         #수명그래프에만 범례 표시하고 범례 선택할 수 있도록 한다.
         if k == 0 :
@@ -814,33 +939,57 @@ class WindowClass(QMainWindow, form_class) :
             self.dic_fig_visibleV[self.list_fig[self.idx_fig]] = self.visibleV
 
             #merge 데이터프레임 추출
-            #for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
-                #self.df_hourpass_raw_m.append(self.dic_fig_rawline_dfhourpass[temp_idx][c])
-                #self.df_hourpass_plot_m.append(self.dic_fig_rawline_dfhourpass[temp_idx][c])
-                #self.df_LT_raw_m.append(self.dic_fig_rawline_dfhourpass[temp_idx][c])
-            print('git test')
 
-            for v_line in self.visible_LTline_list:
-                if flag_plot_delv['plotMax'] == False:
-                    self.df_hourpass_raw_m.append(self.dic_rawline_dfhourpass[v_line])
-                    self.df_LT_raw_m.append(self.dic_rawline_dfLT[v_line])
+            self.temp_list = []
+            #c : visible line / fig - line - dfhourpass
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                print(self.dic_fig_line_dfhourpassraw[self.list_fig[temp_idx]])
+                self.temp_list.append(self.dic_fig_line_dfhourpassraw[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfhourpassraw[self.list_fig[self.idx_fig]] = self.temp_list
 
-                else:
-                    self.df_hourpass_plot_m.append(self.dic_plotline_dfhourpass[v_line])
-                    self.df_LT_plot_m.append(self.dic_plotline_dfLT[v_line])
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfhourpassplot[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfhourpassplot[self.list_fig[self.idx_fig]] = self.temp_list
 
-            for v_line in self.visible_Vline_list:
-                if flag_plot_delv['plotMax'] == False:
-                    self.df_V_raw_m.append(self.dic_rawline_dfV[v_line])
-                    self.df_delV_raw_m.append(self.dic_rawline_dfdelV[v_line])
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfVraw[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfVraw[self.list_fig[self.idx_fig]] = self.temp_list
 
-                else:
-                    self.df_V_plot_m.append(self.dic_plotline_dfV[v_line])
-                    self.df_delV_plot_m.append(self.dic_plotline_dfdelV[v_line])
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfVplot[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfVplot[self.list_fig[self.idx_fig]] = self.temp_list
+
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfdelVraw[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfdelVraw[self.list_fig[self.idx_fig]] = self.temp_list
+
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfdelVplot[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfdelVplot[self.list_fig[self.idx_fig]] = self.temp_list
+
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfLTraw[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfLTraw[self.list_fig[self.idx_fig]] = self.temp_list
+
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dfLTplot[self.list_fig[temp_idx]][c])
+            self.dic_fig_dfLTplot[self.list_fig[self.idx_fig]] = self.temp_list
+
+            self.temp_list = []
+            for c in self.dic_fig_visibleLT[self.list_fig[self.idx_fig]]:
+                self.temp_list.append(self.dic_fig_line_dflegend[self.list_fig[temp_idx]][c])
+            self.dic_fig_dflegend[self.list_fig[self.idx_fig]] = self.temp_list
 
             self.plotLT(self.lot_final_list)
 
-        self.fig.canvas.draw()
+        self.list_fig[self.idx_fig].canvas.draw()
 
 ###############################################Plot Event 여기까지########################################################
 ########################################################################################################################
