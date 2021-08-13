@@ -1,0 +1,8 @@
+파이참 키세팅
+
+Debug : Ctrl + R
+Run : F5
+Step Into My Curosr : F8
+Run To Cursor : F6
+Comment with Line Comment : Ctrl+q
+Stop : Ctrl + 4
