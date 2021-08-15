@@ -6,5 +6,5 @@ title_font_size,9.0
 run_plotMax,p
 run_delV,d
 plot_time_ratio,1.2
-fig_width,8
-fig_length,8
+fig_width,7
+fig_length,7
