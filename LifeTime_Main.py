@@ -51,7 +51,7 @@ plt.rc('axes', prop_cycle=cycler(color=[
     [1,1,0]
 ]))
 
-flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'path_find':0}
+flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'path_find':0, 'plot_btn':False}
 
 #Setting.txt를 Dict로 가져오기
 with open('Setting.txt', 'r') as f:
@@ -268,6 +268,30 @@ class WindowClass(QMainWindow, form_class) :
 
     #수명 경로 DF : df_life_path
     def lifetime_path_list(self):
+
+        #최초 plot
+        if flag_plot_delv['plot_btn'] == False: pass        #plot 그림
+        else:
+            #껐다가 켰을 때
+            if '640x480' in str(plt.figure(1)):
+                plt.close(1)
+                pass
+            #이미 fig 존재 할때 : Interlock
+            else:
+                QMessageBox.warning(self, "Path Interlock", "Plot이 있는 상태에서 추가 Plot 불가")
+                return
+
+            #print(plt.get_plot_commands())
+            #test_fig = plt.figure('test_fig')
+            #plt.show()
+            #있는 상태에서 plot
+            #print(test_fig.title)
+            # if plt.gcf().number > 1:
+            #     QMessageBox.warning(self, "Path Interlock", "Plot이 있는 상태에서 추가 Plot 불가")
+            #     return
+            # #껐다가 새로 키는 경우
+            # elif plt.gcf().number == 1:
+            #     pass
 
         flag_plot_delv['delV'] = False
         flag_plot_delv['plotMax'] = False
