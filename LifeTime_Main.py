@@ -306,6 +306,8 @@ class WindowClass(QMainWindow, form_class) :
         self.dic_fig_V_LT = {}
         self.dic_fig_V_leg = {}
         self.dic_fig_ax = {}
+        self.dic_fig_on_press_line = {}
+        self.dic_fig_on_press_legend = {}
 
         # merge
         self.dic_fig_dfhourpassraw = {}
@@ -680,6 +682,10 @@ class WindowClass(QMainWindow, form_class) :
         self.dic_fig_V_LT[self.list_fig[self.idx_fig]] = self.plotlined_V_torig
         self.dic_fig_V_leg[self.list_fig[self.idx_fig]] = self.lined_V_torig
 
+        self.dic_fig_on_press_line[self.list_fig[self.idx_fig]] = self.on_press_line
+        self.dic_fig_on_press_legend[self.list_fig[self.idx_fig]] = self.on_press_legend
+
+
     def draw_LT_V_graph_m(self, LT_index, k):
         #전압 선택
         if k == 1 and self.chk_V.isChecked() == False:
@@ -764,6 +770,9 @@ class WindowClass(QMainWindow, form_class) :
         self.dic_fig_V_LT[self.list_fig[self.idx_fig]] = self.plotlined_V_torig
         self.dic_fig_V_leg[self.list_fig[self.idx_fig]] = self.lined_V_torig
 
+        self.dic_fig_on_press_line[self.list_fig[self.idx_fig]] = self.on_press_line
+        self.dic_fig_on_press_legend[self.list_fig[self.idx_fig]] = self.on_press_legend
+
 
 ######################################################Plot Event########################################################
 ########################################################################################################################
@@ -822,9 +831,7 @@ class WindowClass(QMainWindow, form_class) :
                     #범례 - 수명
                     #secline = self.lined[firline]
                     secline = self.dic_fig_leg_LT[self.list_fig[plt.gcf().number - 1]][firline]
-                    print(str(secline))
                     visible = not secline.get_visible()
-                    print(visible)
                     secline.set_visible(visible)
                     firline.set_alpha(1.0 if visible else 0.01)
 
@@ -873,19 +880,22 @@ class WindowClass(QMainWindow, form_class) :
 
         #라인 다보이게 하기
         if event.key.isdigit():
-            sys.stdout.flush()
+
             #라인
-            for origline in self.on_press_line[int(event.key)-1]:
+            for origline in self.dic_fig_on_press_line[self.list_fig[plt.gcf().number-1]][int(event.key)-1]:
                 origline.set_visible(True)
-            #범례
-            for legline in self.on_press_legend[int(event.key)-1]:
-                legline.set_alpha(1.0)
+
+            for legline in self.dic_fig_on_press_legend[self.list_fig[plt.gcf().number-1]][int(event.key)-1]:
+                legline.set_alpha(1)
         
         #라인 다 안보이게 하기
         if 'ctrl' in event.key and isNumber(event.key[-1]):
-            for origline in self.on_press_line[int(event.key[-1])-1]:
+
+            for origline in self.dic_fig_on_press_line[self.list_fig[plt.gcf().number-1]][int(event.key[-1])-1]:
+                print('unvisible')
                 origline.set_visible(False)
-            for legline in self.on_press_legend[int(event.key[-1])-1]:
+
+            for legline in self.dic_fig_on_press_legend[self.list_fig[plt.gcf().number-1]][int(event.key[-1])-1]:
                 legline.set_alpha(0.01)
 
         #델타브이
@@ -996,7 +1006,7 @@ class WindowClass(QMainWindow, form_class) :
 
             self.plotLT(self.lot_final_list)
 
-        self.list_fig[self.idx_fig].canvas.draw()
+        self.list_fig[plt.gcf().number-1].canvas.draw()
 
 ###############################################Plot Event 여기까지########################################################
 ########################################################################################################################
