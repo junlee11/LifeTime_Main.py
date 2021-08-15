@@ -51,7 +51,7 @@ plt.rc('axes', prop_cycle=cycler(color=[
     [1,1,0]
 ]))
 
-flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'plot_btn':0}
+flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False}
 
 #Setting.txt를 Dict로 가져오기
 with open('Setting.txt', 'r') as f:
@@ -173,70 +173,6 @@ class WindowClass(QMainWindow, form_class) :
         #설정하기
         self.push_set.clicked.connect(self.set_up)
 
-##########################################################변수 초기화
-
-
-        # 딕셔너리 선언 : fig - axlist - df
-
-        self.dic_fig_ax_dfhourpassraw = {}
-        self.dic_fig_ax_dfhourpassplot = {}
-        self.dic_fig_ax_dfVraw = {}
-        self.dic_fig_ax_dfVplot = {}
-        self.dic_fig_ax_dfLTraw = {}
-        self.dic_fig_ax_dfLTplot = {}
-        self.dic_fig_ax_delVraw = {}
-        self.dic_fig_ax_delVplot = {}
-        self.dic_fig_ax_dflegend = {}
-        self.dic_fig_ax_dfdelVraw = {}
-        self.dic_fig_ax_dfdelVplot = {}
-
-        self.dic_ax_dfhourpassraw = {}
-        self.dic_ax_dfhourpassplot = {}
-        self.dic_ax_dfVraw = {}
-        self.dic_ax_dfVplot = {}
-        self.dic_ax_dfLTraw = {}
-        self.dic_ax_dfLTplot = {}
-        self.dic_ax_dfdelVraw = {}
-        self.dic_ax_dfdelVplot = {}
-        self.dic_ax_dflegend = {}
-
-        self.dic_fig_leg_LT = {}
-        self.dic_fig_leg_V = {}
-        self.dic_fig_LT_leg = {}
-        self.dic_fig_LT_V = {}
-        self.dic_fig_V_LT = {}
-        self.dic_fig_V_leg = {}
-        self.dic_fig_ax = {}
-
-        #merge
-        self.dic_fig_dfhourpassraw = {}
-        self.dic_fig_dfhourpassplot = {}
-        self.dic_fig_dfVraw = {}
-        self.dic_fig_dfVplot = {}
-        self.dic_fig_dfdelVraw = {}
-        self.dic_fig_dfdelVplot = {}
-        self.dic_fig_dflegend = {}
-        self.dic_fig_dfLTraw = {}
-        self.dic_fig_dfLTplot = {}
-
-        self.dic_fig_line_dfhourpassraw = {}
-        self.dic_fig_line_dfhourpassplot = {}
-        self.dic_fig_line_dfVraw = {}
-        self.dic_fig_line_dfVplot = {}
-        self.dic_fig_line_dfdelVraw = {}
-        self.dic_fig_line_dfdelVplot = {}
-        self.dic_fig_line_dfLTraw = {}
-        self.dic_fig_line_dfLTplot = {}
-        self.dic_fig_line_dflegend = {}
-
-        # 리스트 선언
-        self.list_fig = []
-        self.list_ax = []
-
-        #Merge용
-        self.dic_fig_ax_line = {}
-        self.dic_ax_line = {}
-
     #################################################################경로생성
     def path_list_1(self):
         if self.list1.currentItem().text() == "증착 1호기":
@@ -333,11 +269,72 @@ class WindowClass(QMainWindow, form_class) :
     #수명 경로 DF : df_life_path
     def lifetime_path_list(self):
 
-        flag_plot_delv['plot_btn'] += 1
-
         flag_plot_delv['delV'] = False
         flag_plot_delv['plotMax'] = False
         flag_plot_delv['merge'] = False
+
+        ##########################################################변수 초기화
+
+        # 딕셔너리 선언 : fig - axlist - df
+
+        self.dic_fig_ax_dfhourpassraw = {}
+        self.dic_fig_ax_dfhourpassplot = {}
+        self.dic_fig_ax_dfVraw = {}
+        self.dic_fig_ax_dfVplot = {}
+        self.dic_fig_ax_dfLTraw = {}
+        self.dic_fig_ax_dfLTplot = {}
+        self.dic_fig_ax_delVraw = {}
+        self.dic_fig_ax_delVplot = {}
+        self.dic_fig_ax_dflegend = {}
+        self.dic_fig_ax_dfdelVraw = {}
+        self.dic_fig_ax_dfdelVplot = {}
+
+        self.dic_ax_dfhourpassraw = {}
+        self.dic_ax_dfhourpassplot = {}
+        self.dic_ax_dfVraw = {}
+        self.dic_ax_dfVplot = {}
+        self.dic_ax_dfLTraw = {}
+        self.dic_ax_dfLTplot = {}
+        self.dic_ax_dfdelVraw = {}
+        self.dic_ax_dfdelVplot = {}
+        self.dic_ax_dflegend = {}
+
+        self.dic_fig_leg_LT = {}
+        self.dic_fig_leg_V = {}
+        self.dic_fig_LT_leg = {}
+        self.dic_fig_LT_V = {}
+        self.dic_fig_V_LT = {}
+        self.dic_fig_V_leg = {}
+        self.dic_fig_ax = {}
+
+        # merge
+        self.dic_fig_dfhourpassraw = {}
+        self.dic_fig_dfhourpassplot = {}
+        self.dic_fig_dfVraw = {}
+        self.dic_fig_dfVplot = {}
+        self.dic_fig_dfdelVraw = {}
+        self.dic_fig_dfdelVplot = {}
+        self.dic_fig_dflegend = {}
+        self.dic_fig_dfLTraw = {}
+        self.dic_fig_dfLTplot = {}
+
+        self.dic_fig_line_dfhourpassraw = {}
+        self.dic_fig_line_dfhourpassplot = {}
+        self.dic_fig_line_dfVraw = {}
+        self.dic_fig_line_dfVplot = {}
+        self.dic_fig_line_dfdelVraw = {}
+        self.dic_fig_line_dfdelVplot = {}
+        self.dic_fig_line_dfLTraw = {}
+        self.dic_fig_line_dfLTplot = {}
+        self.dic_fig_line_dflegend = {}
+
+        # 리스트 선언
+        self.list_fig = []
+        self.list_ax = []
+
+        # Merge용
+        self.dic_fig_ax_line = {}
+        self.dic_ax_line = {}
 
         self.flag_merge = 0 if flag_plot_delv['merge'] == False else 1
 
@@ -387,6 +384,8 @@ class WindowClass(QMainWindow, form_class) :
                         self.lot_final_list.append(self.life_path)
                         break
 
+
+
         self.plotLT(self.lot_final_list)
     
     #그래프 그리기 시작
@@ -433,10 +432,6 @@ class WindowClass(QMainWindow, form_class) :
         if flag_plot_delv['plotMax_btn'] == True or flag_plot_delv['delV_btn'] == True:
             plt.close(self.list_fig[self.idx_fig])
 
-        #plot을 닫았다가 켰을 때 이벤트 발생시킬수 있도록 fig 리스트 삭제
-        if flag_plot_delv['plot_btn'] > 1:
-            self.list_fig.pop()
-
         if flag_plot_delv['merge'] == False:
             self.idx_fig = plt.gcf().number - 1
             self.list_fig.append(self.fig)
@@ -446,8 +441,10 @@ class WindowClass(QMainWindow, form_class) :
         else:
             gs = self.list_fig[self.idx_fig].add_gridspec(2, 1, height_ratios=[3, 1]) if self.chk_V.isChecked()==True else self.list_fig[self.idx_fig].add_gridspec(1, 1)
 
+        i_cnt = 0
         #Lot에 대한 반복을 진행
         for i in LT_list:
+
             self.df_hourpass_raw = []
             self.df_V_raw = []
             self.df_LT_raw = []
@@ -471,6 +468,9 @@ class WindowClass(QMainWindow, form_class) :
             self.dic_plotline_dfLT = {}
             self.visible_LTline_list = []
             self.visible_Vline_list = []
+
+            if i_cnt == 1 and flag_plot_delv['merge'] == True:
+                break
 
             kk = 0
 ########################################################################################################################
@@ -529,11 +529,10 @@ class WindowClass(QMainWindow, form_class) :
                         self.ax = self.fig.add_subplot(gs[k, 0])
                     elif self.chk_V.isChecked() == False and k == 0:
                         self.ax = self.fig.add_subplot(gs[0,0])
-                
-                #210813
+
                 self.list_ax.append(self.ax)
 
-                if flag_plot_delv['merge'] : self.m_flag += 1
+                # if flag_plot_delv['merge'] == True : self.m_flag += 1
 
                 # 하나의 ax에 대한 딕셔너리 연결
                 self.dic_ax_dfhourpassraw[self.list_ax[LT_list.index(i) * (1 + self.flag_V) + k]] = self.df_hourpass_raw
@@ -564,7 +563,6 @@ class WindowClass(QMainWindow, form_class) :
                 else:
                     self.draw_LT_V_graph_m(LT_list.index(i),k)
 
-                #self.dic_fig_ax[self.list_fig[self.idx_fig]] = self.list_ax
                 # merge
                 if flag_plot_delv['plotMax'] == False:self.dic_fig_line_dfhourpassraw[self.list_fig[self.idx_fig]] = self.dic_line_dfhourpassraw
                 if flag_plot_delv['plotMax'] == True:self.dic_fig_line_dfhourpassplot[self.list_fig[self.idx_fig]] = self.dic_line_dfhourpassplot
@@ -576,6 +574,9 @@ class WindowClass(QMainWindow, form_class) :
                 if flag_plot_delv['plotMax'] == True and flag_plot_delv['delV'] == True:self.dic_fig_line_dfdelVplot[self.list_fig[self.idx_fig]] = self.dic_line_dfdelVplot
                 self.dic_fig_line_dflegend[self.list_fig[self.idx_fig]] = self.dic_line_dflegend
 
+            i_cnt += 1
+
+        self.dic_fig_ax[self.list_fig[self.idx_fig]] = self.list_ax
         self.fig.canvas.mpl_connect('pick_event', self.on_pick)
         self.fig.canvas.mpl_connect('key_press_event', self.on_press)
         self.fig.canvas.mpl_connect('button_press_event', self.mouse_click)
@@ -769,8 +770,6 @@ class WindowClass(QMainWindow, form_class) :
 ########################################################################################################################
     def mouse_click(self, event):
 
-        print('a')
-
         if not event.inaxes:
             return
         #right click
@@ -891,15 +890,23 @@ class WindowClass(QMainWindow, form_class) :
 
         #델타브이
         if event.key.upper() == set_dic['run_delV'].upper():
+            if flag_plot_delv['merge'] == True:
+                QMessageBox.warning(self, "Merge Interlock", "Merge 실행 후 DelV 불가")
+                return
             flag_plot_delv['delV'] = not flag_plot_delv['delV']
             flag_plot_delv['delV_btn'] = True
+            self.idx_fig = plt.gcf().number - 1
             #plt.close()
             self.plotLT(self.lot_final_list)
 
         #plotMax
         if event.key.upper() == set_dic['run_plotMax'].upper():
+            if flag_plot_delv['merge'] == True:
+                QMessageBox.warning(self, "QMessageBox", "Merge 실행 후 PlotMax 불가")
+                return
             flag_plot_delv['plotMax'] = not flag_plot_delv['plotMax']
             flag_plot_delv['plotMax_btn'] = True
+            self.idx_fig = plt.gcf().number - 1
             #plt.close()
             self.plotLT(self.lot_final_list)
 
