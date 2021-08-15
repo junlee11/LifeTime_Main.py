@@ -51,7 +51,7 @@ plt.rc('axes', prop_cycle=cycler(color=[
     [1,1,0]
 ]))
 
-flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False}
+flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'plot_btn':False}
 
 #Setting.txt를 Dict로 가져오기
 with open('Setting.txt', 'r') as f:
@@ -269,9 +269,14 @@ class WindowClass(QMainWindow, form_class) :
     #수명 경로 DF : df_life_path
     def lifetime_path_list(self):
 
+        if flag_plot_delv['plot_btn'] == True:
+            QMessageBox.warning(self, "Plot Interlock", "이미 Plot이 있습니다.")
+            return
+
         flag_plot_delv['delV'] = False
         flag_plot_delv['plotMax'] = False
         flag_plot_delv['merge'] = False
+        flag_plot_delv['plot_btn'] = True
 
         ##########################################################변수 초기화
 
@@ -534,8 +539,6 @@ class WindowClass(QMainWindow, form_class) :
 
                 self.list_ax.append(self.ax)
 
-                # if flag_plot_delv['merge'] == True : self.m_flag += 1
-
                 # 하나의 ax에 대한 딕셔너리 연결
                 self.dic_ax_dfhourpassraw[self.list_ax[LT_list.index(i) * (1 + self.flag_V) + k]] = self.df_hourpass_raw
                 self.dic_ax_dfhourpassplot[self.list_ax[LT_list.index(i) * (1 + self.flag_V) + k]] = self.df_hourpass_plot
@@ -669,11 +672,11 @@ class WindowClass(QMainWindow, form_class) :
                 self.lined_V[legline] = origline_V          #범례 - 전압
                 self.lined_V_torig[origline_V] = legline    #전압 - 범례
                 self.on_press_temp.append(origline_V)
-            self.on_press_line[LT_index] = self.on_press_temp  # on_press용 인덱스 - 라인 딕셔너리
 
             for origline, origline_V in zip(self.picker_lines[LT_index *2], self.picker_lines[LT_index * 2 + 1]):
                 self.plotlined_V[origline] = origline_V     #수명 - 전압
                 self.plotlined_V_torig[origline_V] = origline #전압 - 수명
+        self.on_press_line[LT_index] = self.on_press_temp  # on_press용 인덱스 - 라인 딕셔너리
 
         self.dic_fig_leg_LT[self.list_fig[self.idx_fig]] = self.lined
         self.dic_fig_leg_V[self.list_fig[self.idx_fig]] = self.lined_V
@@ -757,11 +760,11 @@ class WindowClass(QMainWindow, form_class) :
                 self.lined_V[legline] = origline_V          #범례 - 전압
                 self.lined_V_torig[origline_V] = legline    #전압 - 범례
                 self.on_press_temp.append(origline_V)
-            self.on_press_line[LT_index] = self.on_press_temp  # on_press용 인덱스 - 라인 딕셔너리
 
             for origline, origline_V in zip(self.picker_lines[LT_index *2], self.picker_lines[LT_index * 2 + 1]):
                 self.plotlined_V[origline] = origline_V     #수명 - 전압
                 self.plotlined_V_torig[origline_V] = origline #전압 - 수명
+        self.on_press_line[LT_index] = self.on_press_temp  # on_press용 인덱스 - 라인 딕셔너리
 
         self.dic_fig_leg_LT[self.list_fig[self.idx_fig]] = self.lined
         self.dic_fig_leg_V[self.list_fig[self.idx_fig]] = self.lined_V
@@ -892,7 +895,6 @@ class WindowClass(QMainWindow, form_class) :
         if 'ctrl' in event.key and isNumber(event.key[-1]):
 
             for origline in self.dic_fig_on_press_line[self.list_fig[plt.gcf().number-1]][int(event.key[-1])-1]:
-                print('unvisible')
                 origline.set_visible(False)
 
             for legline in self.dic_fig_on_press_legend[self.list_fig[plt.gcf().number-1]][int(event.key[-1])-1]:
