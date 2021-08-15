@@ -51,7 +51,7 @@ plt.rc('axes', prop_cycle=cycler(color=[
     [1,1,0]
 ]))
 
-flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'plot_btn':False}
+flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'path_find':0}
 
 #Setting.txt를 Dict로 가져오기
 with open('Setting.txt', 'r') as f:
@@ -269,14 +269,11 @@ class WindowClass(QMainWindow, form_class) :
     #수명 경로 DF : df_life_path
     def lifetime_path_list(self):
 
-        if flag_plot_delv['plot_btn'] == True:
-            QMessageBox.warning(self, "Plot Interlock", "이미 Plot이 있습니다.")
-            return
-
         flag_plot_delv['delV'] = False
         flag_plot_delv['plotMax'] = False
         flag_plot_delv['merge'] = False
         flag_plot_delv['plot_btn'] = True
+        flag_plot_delv['path_find'] = 0
 
         ##########################################################변수 초기화
 
@@ -348,10 +345,13 @@ class WindowClass(QMainWindow, form_class) :
         self.lot_final_list = []
 
         #Lot_list 있는 만큼 반복
+        self.not_find_path=[]
+
         for i in range(self.Lot_list.count()):
             self.Lot_name = self.Lot_list.item(i).text()[:7]
             self.Lot_year = '20' + self.Lot_name[:2]
             self.Lot_month = self.Lot_name[2:4]
+            p_flag = 0
 
             #수명 호기 접근
             for life_eqp_path in df_life_path['Path']:
@@ -389,11 +389,24 @@ class WindowClass(QMainWindow, form_class) :
                     if self.Lot_name in life_lot and d_flag == 1:
                         self.life_path = self.life_path + life_lot + '\\'
                         self.lot_final_list.append(self.life_path)
+                        flag_plot_delv['path_find'] += 1
+                        p_flag = 1
                         break
 
+            if p_flag == 0:
+                self.not_find_path.append(self.Lot_name)
 
-
+        total_not_find_str = ""
+        if flag_plot_delv['path_find'] != self.Lot_list.count():
+            for i in range(len(self.not_find_path)):
+                if i == len(self.not_find_path)-1:
+                    total_not_find_str = total_not_find_str + self.not_find_path[i]
+                else:
+                    total_not_find_str = total_not_find_str + self.not_find_path[i] + ', '
+            QMessageBox.warning(self, "Path Interlock", "수명 경로를 찾을 수 없습니다.\n" + total_not_find_str)
+            return
         self.plotLT(self.lot_final_list)
+
     
     #그래프 그리기 시작
     def plotLT(self, LT_list):                  #LT_list는 Main화면에서 추출한 경로 리스트
