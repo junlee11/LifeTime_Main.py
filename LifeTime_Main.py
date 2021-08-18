@@ -16,6 +16,7 @@ from PyQt5 import uic
 from pptx import Presentation
 import matplotlib.pyplot as plt
 import numpy as np
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 #설정
 set_picker_line = None
@@ -51,7 +52,9 @@ plt.rc('axes', prop_cycle=cycler(color=[
     [1,1,0]
 ]))
 
-flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'path_find':0, 'plot_btn':False}
+flag_plot_delv = {'plotMax':False, 'delV':False, 'merge':False, 'plotMax_btn':False, 'delV_btn':False, 'path_find':0, 'plot_btn':False, 'LT_table_btn':False}
+lot_f_list = []
+dic_Lot_row = {}
 
 #Setting.txt를 Dict로 가져오기
 with open('Setting.txt', 'r') as f:
@@ -124,13 +127,13 @@ def arr_path(f_path):
 
     return folder_list + excel_list + powerpoint_list + f_path_list
 
-
 #해당 경로 폴더 열때 os.startfile(path_depo1)
 
 #UI파일 연결
 #단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 form_class = uic.loadUiType("LT_Ui.ui")[0]
 form_class_set = uic.loadUiType("Setting_Ui.ui")[0]
+form_class_LT_table = uic.loadUiType("LT_Table.ui")[0]
 
 #화면을 띄우는데 사용되는 Class 선언
 #QMainWindow Class를 상속
@@ -142,6 +145,8 @@ class WindowClass(QMainWindow, form_class) :
 
         global set_dic
         global flag_plot_delv
+        global lot_f_list
+        global dic_lot_row
         self.list1_path = ""
         self.list2_path = ""
         self.list3_path = ""
@@ -168,6 +173,7 @@ class WindowClass(QMainWindow, form_class) :
 
         #Lot 열기
         self.push_LT.clicked.connect(self.lifetime_path_list)       #self.life_path_list
+        self.push_LT_table.clicked.connect(self.load_LT_table)
         self.Lot_list.itemDoubleClicked.connect(self.Lot_list_del)
 
         #설정하기
@@ -280,18 +286,6 @@ class WindowClass(QMainWindow, form_class) :
             else:
                 QMessageBox.warning(self, "Path Interlock", "Plot이 있는 상태에서 추가 Plot 불가")
                 return
-
-            #print(plt.get_plot_commands())
-            #test_fig = plt.figure('test_fig')
-            #plt.show()
-            #있는 상태에서 plot
-            #print(test_fig.title)
-            # if plt.gcf().number > 1:
-            #     QMessageBox.warning(self, "Path Interlock", "Plot이 있는 상태에서 추가 Plot 불가")
-            #     return
-            # #껐다가 새로 키는 경우
-            # elif plt.gcf().number == 1:
-            #     pass
 
         flag_plot_delv['delV'] = False
         flag_plot_delv['plotMax'] = False
@@ -629,6 +623,7 @@ class WindowClass(QMainWindow, form_class) :
         plt.show()
 
     def draw_LT_V_graph(self, LT_index, k):
+
         #전압 선택
         if k == 1 and self.chk_V.isChecked() == False:
             k = 2
@@ -646,9 +641,10 @@ class WindowClass(QMainWindow, form_class) :
             if k == 0 :
 
                 if flag_plot_delv['plotMax'] == False:
-
                     if m == 0: self.hourpass_max_val = self.df_hourpass_R.max()[0]
                     if self.hourpass_max_val < self.df_hourpass_R.max()[0]: self.hourpass_max_val = self.df_hourpass_R.max()[0]
+                    self.n_row += 1
+
                 self.temp_l, = self.ax.plot(self.df_hourpass_R, self.df_LT_R, label=self.df_legend_R[-15:], picker=float(set_dic['picker_line']), linewidth=float(set_dic['thick_line']))
                 if self.df_LT_R.min()[5] < float(set_dic['import_MinLT']) or not str(self.df_LT_R.min()[5]).isdigit():  # 설정값보다 더 작은 값이 있다면
                     self.LT_min_val = float(set_dic['import_MinLT'])
@@ -1122,10 +1118,189 @@ class WindowClass(QMainWindow, form_class) :
         if '(0.789286,0.355;0.110714x0.525)' in e_str: return 10
         if '(0.789286,0.11;0.110714x0.175)' in e_str: return 11
 
+    #LT_Table Load
+    def load_LT_table(self):
+        global lot_f_list
+        global dic_Lot_row
+
+        lot_f_list = []
+        dic_Lot_row = {}
+
+        flag_plot_delv['LT_table_btn'] = True
+        flag_plot_delv['path_find'] = 0
+        self.not_find_path = []
+
+        ################################################경로 찾기
+        for i in range(self.Lot_list.count()):
+            self.Lot_name_t = self.Lot_list.item(i).text()[:7]
+            self.Lot_year_t = '20' + self.Lot_name_t[:2]
+            self.Lot_month_t = self.Lot_name_t[2:4]
+            p_flag = 0
+
+            # 수명 호기 접근
+            for life_eqp_path in df_life_path['Path']:
+                # Lot 년도
+                y_flag = 0
+                for life_year in arr_path(life_eqp_path):
+                    if self.Lot_year_t in life_year:
+                        self.life_path = life_eqp_path + '\\' + life_year + '\\'
+                        y_flag = 1
+                        break
+                # Lot 월
+                m_flag = 0
+                if self.Lot_month_t[0] == '1' and y_flag == 1:
+                    for life_month in arr_path(self.life_path):
+                        if self.Lot_month_t in life_month:
+                            self.life_path = self.life_path + life_month + '\\'
+                            m_flag = 1
+                            break
+                elif self.Lot_month_t[0] == '0' and y_flag == 1:
+                    for life_month in arr_path(self.life_path):
+                        if self.Lot_month_t[-1] in life_month and self.Lot_month_t[0] == '0':
+                            self.life_path = self.life_path + life_month + '\\'
+                            m_flag = 1
+                            break
+                # 증착호기
+                d_flag = 0
+                if '1호기' in self.basic_list_arr[0].currentItem().text() and m_flag == 1:
+                    self.life_path = self.life_path + '증착1호기' + '\\'
+                    d_flag = 1
+                elif '2호기' in self.basic_list_arr[0].currentItem().text() and m_flag == 1:
+                    self.life_path = self.life_path + '증착2호기' + '\\'
+                    d_flag = 1
+                # Lot
+                for life_lot in arr_path(self.life_path):
+                    if self.Lot_name_t in life_lot and d_flag == 1:
+                        self.life_path = self.life_path + life_lot + '\\'
+                        lot_f_list.append(self.life_path)
+                        flag_plot_delv['path_find'] += 1
+                        p_flag = 1
+                        break
+
+            if p_flag == 0:
+                self.not_find_path.append(self.Lot_name_t)
+
+            dic_Lot_row[i] = len(os.listdir(lot_f_list[i]))
+
+        total_not_find_str = ""
+        if flag_plot_delv['path_find'] != self.Lot_list.count():
+            for i in range(len(self.not_find_path)):
+                if i == len(self.not_find_path) - 1:
+                    total_not_find_str = total_not_find_str + self.not_find_path[i]
+                else:
+                    total_not_find_str = total_not_find_str + self.not_find_path[i] + ', '
+            QMessageBox.warning(self, "Path Interlock", "수명 경로를 찾을 수 없습니다.\n" + total_not_find_str)
+            return
+
+        self.dlg_LT_table = LT_table_dialog()
+        self.dlg_LT_table.setWindowFlag(Qt.WindowMinimizeButtonHint, True)
+        self.dlg_LT_table.setWindowFlag(Qt.WindowMaximizeButtonHint, True)
+        self.dlg_LT_table.exec_()
+
     #설정 버튼
     def set_up(self):
         self.dlg = Setdialog()
         self.dlg.exec_()
+
+class LT_table_dialog(QDialog):
+    def __init__(self):
+
+        super().__init__()
+        global set_dic
+        global lot_f_list
+        global dic_Lot_row
+
+        self.setupUi(self)              #1. Lot_list[], 2. dic_Lot_row,
+
+    #ui파일에서 가져옴
+    def setupUi(self, Dialog):
+        Dialog.setObjectName("Dialog")
+        Dialog.resize(1056, 400 * len(lot_f_list))        #dialog 전체 size
+        self.gridLayout = QtWidgets.QGridLayout(Dialog)
+        self.gridLayout.setObjectName("gridLayout")
+        self.scrollArea = QtWidgets.QScrollArea(Dialog)
+        self.scrollArea.setWidgetResizable(False)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1032, 350 * len(lot_f_list)))          #수명테이블 사이즈 결정
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.frame = QtWidgets.QFrame(self.scrollAreaWidgetContents)
+        self.frame.setMinimumSize(QtCore.QSize(0, 350 * len(lot_f_list)))                                   #스크롤 최소 사이즈
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.frame)
+        self.gridLayout_2.setContentsMargins(10, 10, 10, 30)
+        self.gridLayout_2.setSpacing(20)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+
+        #addWidget (self, QWidget, row, column, rowSpan, columnSpan, Qt.Alignment alignment = 0)
+        ##########################################################객체
+        #Lot1
+        for i in range(len(lot_f_list)):
+
+            self.line_Lot1 = QtWidgets.QLineEdit(self.frame)
+            self.line_Lot1.setObjectName("line_Lot1")
+            self.gridLayout_2.addWidget(self.line_Lot1, i*2, 0, 1, 1)
+
+            ############################################################table1 front 코드
+            self.table1_Lot1 = QtWidgets.QTableWidget(self.frame)
+            self.table1_Lot1.setObjectName("table1_Lot1")
+            self.table1_Lot1.setColumnCount(10)
+            self.table1_Lot1.setRowCount(25)
+            self.table1_Lot1.horizontalHeader().setVisible(True)
+            self.table1_Lot1.verticalHeader().setVisible(False)
+            self.table1_Lot1.setHorizontalHeaderLabels(('TL', '파일명', 'Max(%)', 'Max(h)', '99%', '98%', '95%', '90%', '파일위치', 'mA'))
+            self.table1_Lot1.horizontalHeader().setFrameStyle(QFrame.Box)
+            self.table1_Lot1.horizontalHeader().setLineWidth(1)
+            self.table1_Lot1.horizontalHeader().setFont(QtGui.QFont('맑은 고딕', 7))
+            self.table1_Lot1.horizontalHeader().setMinimumSectionSize(3)
+
+            #self.table1_Lot1.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)           #열너비 자동조절
+            self.table1_Lot1.setColumnWidth(0, 28)
+            self.table1_Lot1.setColumnWidth(1, 220)
+            self.table1_Lot1.setColumnWidth(2, 50)
+            self.table1_Lot1.setColumnWidth(3, 50)
+            self.table1_Lot1.setColumnWidth(4, 40)
+            self.table1_Lot1.setColumnWidth(5, 40)
+            self.table1_Lot1.setColumnWidth(6, 40)
+            self.table1_Lot1.setColumnWidth(7, 40)
+            self.table1_Lot1.setColumnWidth(8, 155)
+            self.table1_Lot1.setColumnWidth(9, 50)
+            self.table1_Lot1.horizontalHeader().setStretchLastSection(True)
+
+            self.table1_Lot1.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.table1_Lot1.verticalHeader().setMinimumSectionSize(5)
+            self.table1_Lot1.setFont(QtGui.QFont('맑은 고딕', 7))
+            item = QTableWidgetItem()
+            item.setText('test')
+            item.setTextAlignment(Qt.AlignCenter)
+            self.table1_Lot1.setItem(1,1,item)
+            self.gridLayout_2.addWidget(self.table1_Lot1, i * 2 + 1, 0, 1, 1)
+            ###############################################################
+
+            self.table2_Lot1 = QtWidgets.QTableWidget(self.frame)
+            self.table2_Lot1.setObjectName("table2_Lot1")
+            self.table2_Lot1.setColumnCount(0)
+            self.table2_Lot1.setRowCount(0)
+            self.gridLayout_2.addWidget(self.table2_Lot1, i * 2 + 1, 1, 1, 1)
+
+            self.verticalLayout.addWidget(self.frame)
+            self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+            self.gridLayout.addWidget(self.scrollArea, 0, 0, 1, 1)
+            self.gridLayout_2.setColumnStretch(0, 3)
+            self.gridLayout_2.setColumnStretch(1, 1)
+
+        self.retranslateUi(Dialog)
+        QtCore.QMetaObject.connectSlotsByName(Dialog)
+
+    def retranslateUi(self, Dialog):
+        _translate = QtCore.QCoreApplication.translate
+        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+
 
 class Setdialog(QDialog, form_class_set):
     def __init__(self):
